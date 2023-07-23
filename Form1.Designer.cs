@@ -32,12 +32,17 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.gbPDFname = new System.Windows.Forms.GroupBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.cbStopEarly = new System.Windows.Forms.CheckBox();
             this.tbPdfName = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tbTotalMatch = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tbNumPages = new System.Windows.Forms.TextBox();
             this.gbSearch = new System.Windows.Forms.GroupBox();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.btnImport = new System.Windows.Forms.Button();
+            this.btnExport = new System.Windows.Forms.Button();
             this.dgv_phrases = new System.Windows.Forms.DataGridView();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnInvert = new System.Windows.Forms.Button();
@@ -55,16 +60,15 @@
             this.tbMatches = new System.Windows.Forms.TextBox();
             this.pbarLoading = new System.Windows.Forms.ProgressBar();
             this.btnRunSearch = new System.Windows.Forms.Button();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.cbStopEarly = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.gbPDFname.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.gbSearch.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_phrases)).BeginInit();
             this.menuStrip1.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox1
@@ -83,12 +87,34 @@
             this.gbPDFname.Controls.Add(this.tbPdfName);
             this.gbPDFname.Controls.Add(this.groupBox2);
             this.gbPDFname.Controls.Add(this.groupBox1);
-            this.gbPDFname.Location = new System.Drawing.Point(114, 12);
+            this.gbPDFname.Location = new System.Drawing.Point(135, 12);
             this.gbPDFname.Name = "gbPDFname";
-            this.gbPDFname.Size = new System.Drawing.Size(530, 167);
+            this.gbPDFname.Size = new System.Drawing.Size(509, 167);
             this.gbPDFname.TabIndex = 4;
             this.gbPDFname.TabStop = false;
             this.gbPDFname.Text = " Current PDF";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.cbStopEarly);
+            this.groupBox3.Location = new System.Drawing.Point(357, 93);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(130, 49);
+            this.groupBox3.TabIndex = 4;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Stop after 40 pages";
+            // 
+            // cbStopEarly
+            // 
+            this.cbStopEarly.AutoSize = true;
+            this.cbStopEarly.Checked = true;
+            this.cbStopEarly.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbStopEarly.Location = new System.Drawing.Point(45, 22);
+            this.cbStopEarly.Name = "cbStopEarly";
+            this.cbStopEarly.Size = new System.Drawing.Size(15, 14);
+            this.cbStopEarly.TabIndex = 0;
+            this.toolTip1.SetToolTip(this.cbStopEarly, "Used for testing ");
+            this.cbStopEarly.UseVisualStyleBackColor = true;
             // 
             // tbPdfName
             // 
@@ -133,6 +159,7 @@
             // 
             // gbSearch
             // 
+            this.gbSearch.Controls.Add(this.groupBox4);
             this.gbSearch.Controls.Add(this.dgv_phrases);
             this.gbSearch.Controls.Add(this.btnSave);
             this.gbSearch.Controls.Add(this.btnInvert);
@@ -143,24 +170,58 @@
             this.gbSearch.Controls.Add(this.cbIgnoreCase);
             this.gbSearch.Location = new System.Drawing.Point(48, 198);
             this.gbSearch.Name = "gbSearch";
-            this.gbSearch.Size = new System.Drawing.Size(503, 394);
+            this.gbSearch.Size = new System.Drawing.Size(547, 394);
             this.gbSearch.TabIndex = 5;
             this.gbSearch.TabStop = false;
             this.gbSearch.Text = "Phrase Searching";
             // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.btnImport);
+            this.groupBox4.Controls.Add(this.btnExport);
+            this.groupBox4.Location = new System.Drawing.Point(17, 290);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(126, 85);
+            this.groupBox4.TabIndex = 11;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Cliopboard / Notepad";
+            this.toolTip1.SetToolTip(this.groupBox4, "Copy to;.from cliipboard");
+            // 
+            // btnImport
+            // 
+            this.btnImport.Location = new System.Drawing.Point(8, 56);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.Size = new System.Drawing.Size(75, 23);
+            this.btnImport.TabIndex = 1;
+            this.btnImport.Text = "Import";
+            this.toolTip1.SetToolTip(this.btnImport, "Open your phrase liost using notepad and then selecte and copy");
+            this.btnImport.UseVisualStyleBackColor = true;
+            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
+            // 
+            // btnExport
+            // 
+            this.btnExport.Location = new System.Drawing.Point(8, 19);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(75, 23);
+            this.btnExport.TabIndex = 0;
+            this.btnExport.Text = "Export";
+            this.toolTip1.SetToolTip(this.btnExport, "Brint up notepad and seledct paste");
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            // 
             // dgv_phrases
             // 
             this.dgv_phrases.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgv_phrases.Location = new System.Drawing.Point(150, 19);
+            this.dgv_phrases.Location = new System.Drawing.Point(171, 19);
             this.dgv_phrases.Name = "dgv_phrases";
             this.dgv_phrases.ShowEditingIcon = false;
-            this.dgv_phrases.Size = new System.Drawing.Size(333, 311);
+            this.dgv_phrases.Size = new System.Drawing.Size(333, 356);
             this.dgv_phrases.TabIndex = 10;
             this.toolTip1.SetToolTip(this.dgv_phrases, " You may edit the text field but be sure tos save your edits");
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(17, 307);
+            this.btnSave.Location = new System.Drawing.Point(17, 245);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(96, 23);
             this.btnSave.TabIndex = 9;
@@ -172,7 +233,7 @@
             // 
             this.btnInvert.Location = new System.Drawing.Point(17, 216);
             this.btnInvert.Name = "btnInvert";
-            this.btnInvert.Size = new System.Drawing.Size(96, 23);
+            this.btnInvert.Size = new System.Drawing.Size(96, 24);
             this.btnInvert.TabIndex = 8;
             this.btnInvert.Text = "Invert Selection";
             this.btnInvert.UseVisualStyleBackColor = true;
@@ -281,11 +342,11 @@
             // 
             // tbMatches
             // 
-            this.tbMatches.Location = new System.Drawing.Point(650, 198);
+            this.tbMatches.Location = new System.Drawing.Point(650, 217);
             this.tbMatches.Multiline = true;
             this.tbMatches.Name = "tbMatches";
             this.tbMatches.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbMatches.Size = new System.Drawing.Size(396, 330);
+            this.tbMatches.Size = new System.Drawing.Size(396, 311);
             this.tbMatches.TabIndex = 11;
             // 
             // pbarLoading
@@ -309,28 +370,6 @@
             this.btnRunSearch.UseVisualStyleBackColor = true;
             this.btnRunSearch.Click += new System.EventHandler(this.btnRunSearch_Click);
             // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.cbStopEarly);
-            this.groupBox3.Location = new System.Drawing.Point(357, 93);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(130, 49);
-            this.groupBox3.TabIndex = 4;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Stop after 40 pages";
-            // 
-            // cbStopEarly
-            // 
-            this.cbStopEarly.AutoSize = true;
-            this.cbStopEarly.Checked = true;
-            this.cbStopEarly.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbStopEarly.Location = new System.Drawing.Point(45, 22);
-            this.cbStopEarly.Name = "cbStopEarly";
-            this.cbStopEarly.Size = new System.Drawing.Size(15, 14);
-            this.cbStopEarly.TabIndex = 0;
-            this.toolTip1.SetToolTip(this.cbStopEarly, "Used for testing ");
-            this.cbStopEarly.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -349,17 +388,18 @@
             this.Text = "USDA / FNS";
             this.gbPDFname.ResumeLayout(false);
             this.gbPDFname.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.gbSearch.ResumeLayout(false);
             this.gbSearch.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgv_phrases)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -394,6 +434,9 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.CheckBox cbStopEarly;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Button btnImport;
+        private System.Windows.Forms.Button btnExport;
     }
 }
 

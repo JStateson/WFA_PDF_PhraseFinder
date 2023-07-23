@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -397,9 +398,10 @@ namespace WFA_PDF_PhraseFinder
             for (int i = 0; i < NumPhrases; i++)
             {
                 WorkingPhrases[i] = cbIgnoreCase.Checked ? phlist[i].strInSeries[0].ToLower() : phlist[i].strInSeries[0];
-                //InitialPhrase[i].ToLower() : InitialPhrase[i]; 
             }
+            btnRunSearch.Enabled = false;
             RunSearch();
+            btnRunSearch.Enabled = true;
         }
 
         private void UpdateSettings()
@@ -464,6 +466,35 @@ namespace WFA_PDF_PhraseFinder
                 FillPhrases();
             }
 
+        }
+
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            string strOut = "";
+            for (int i = 0; i < NumPhrases; i++)
+            {
+                strOut += phlist[i].Phrase + "\r\n";
+            }
+            System.Windows.Forms.Clipboard.SetText(strOut);
+        }
+
+        private void btnImport_Click(object sender, EventArgs e)
+        {
+            string strTemp = System.Windows.Forms.Clipboard.GetText();
+            if(strTemp == "")
+            {
+                MessageBox.Show("Clipboard is empty.  Do an export to see the correct format");
+                return;
+            }
+            string[] strTemps = Regex.Split(strTemp, "\r\n");
+            NumPhrases = strTemps.Count();
+            InitialPhrase = new string[NumPhrases];
+            WorkingPhrases = new string[NumPhrases];
+            for(int i = 0; i < NumPhrases;i++)
+            {
+                InitialPhrase[i] = strTemps[i];
+            }
+            FillPhrases();
         }
 
         private void fileToolStripMenuItem_Click(object sender, EventArgs e)
