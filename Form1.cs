@@ -92,8 +92,15 @@ namespace WFA_PDF_PhraseFinder
         string[] InitialPhrase = new string[5] { "and", "address", "make sure", "motherboard", "memory" };
         string[] WorkingPhrases = new string[5];
 
-
-
+        private string GetSimpleDate(string sDT)
+        {
+            //Sun 06/09/2019 23:33:53.18 
+            int i = sDT.IndexOf(' ');
+            i++;
+            int j = sDT.LastIndexOf('.');
+            return sDT.Substring(i, j - i);
+        }
+        
         // must have at least 2 letters
         bool bMatchWord(string word, int iPage,int jMax, ref int jWord, ref bool bError)
         {
@@ -229,7 +236,7 @@ namespace WFA_PDF_PhraseFinder
                 //if (strTemp == null) continue;
                 jWord = -1;
                 SetPBAR(p);
-                if (p > 40) break;
+                if (p > 40 && cbStopEarly.Checked) break;
                 int numWords = int.Parse(theseFields.ExecuteThisJavascript("event.value=this.getPageNumWords(" + p + ");"));
                 for (int i = 0; i < numWords; i++)
                 {
@@ -316,6 +323,7 @@ namespace WFA_PDF_PhraseFinder
                 SaveSettings();
             }
             FillPhrases();
+            tbPdfName.Text = "Build date: " + GetSimpleDate(Properties.Resources.BuildDate) + " (v) 1.0 Stateson";
         }
 
 

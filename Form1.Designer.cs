@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.gbPDFname = new System.Windows.Forms.GroupBox();
@@ -54,12 +55,16 @@
             this.tbMatches = new System.Windows.Forms.TextBox();
             this.pbarLoading = new System.Windows.Forms.ProgressBar();
             this.btnRunSearch = new System.Windows.Forms.Button();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.cbStopEarly = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.gbPDFname.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.gbSearch.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_phrases)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox1
@@ -74,6 +79,7 @@
             // 
             // gbPDFname
             // 
+            this.gbPDFname.Controls.Add(this.groupBox3);
             this.gbPDFname.Controls.Add(this.tbPdfName);
             this.gbPDFname.Controls.Add(this.groupBox2);
             this.gbPDFname.Controls.Add(this.groupBox1);
@@ -150,6 +156,7 @@
             this.dgv_phrases.ShowEditingIcon = false;
             this.dgv_phrases.Size = new System.Drawing.Size(333, 311);
             this.dgv_phrases.TabIndex = 10;
+            this.toolTip1.SetToolTip(this.dgv_phrases, " You may edit the text field but be sure tos save your edits");
             // 
             // btnSave
             // 
@@ -200,6 +207,7 @@
             this.btnRemove.Size = new System.Drawing.Size(112, 23);
             this.btnRemove.TabIndex = 5;
             this.btnRemove.Text = "Delete phrase";
+            this.toolTip1.SetToolTip(this.btnRemove, "Be sure to click SAVE ");
             this.btnRemove.UseVisualStyleBackColor = false;
             this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
             // 
@@ -297,8 +305,31 @@
             this.btnRunSearch.Size = new System.Drawing.Size(96, 23);
             this.btnRunSearch.TabIndex = 13;
             this.btnRunSearch.Text = "Run Search";
+            this.toolTip1.SetToolTip(this.btnRunSearch, "Click to start searching");
             this.btnRunSearch.UseVisualStyleBackColor = true;
             this.btnRunSearch.Click += new System.EventHandler(this.btnRunSearch_Click);
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.cbStopEarly);
+            this.groupBox3.Location = new System.Drawing.Point(357, 93);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(130, 49);
+            this.groupBox3.TabIndex = 4;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Stop after 40 pages";
+            // 
+            // cbStopEarly
+            // 
+            this.cbStopEarly.AutoSize = true;
+            this.cbStopEarly.Checked = true;
+            this.cbStopEarly.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbStopEarly.Location = new System.Drawing.Point(45, 22);
+            this.cbStopEarly.Name = "cbStopEarly";
+            this.cbStopEarly.Size = new System.Drawing.Size(15, 14);
+            this.cbStopEarly.TabIndex = 0;
+            this.toolTip1.SetToolTip(this.cbStopEarly, "Used for testing ");
+            this.cbStopEarly.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -327,6 +358,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgv_phrases)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -358,6 +391,9 @@
         private System.Windows.Forms.TextBox tbMatches;
         private System.Windows.Forms.ProgressBar pbarLoading;
         private System.Windows.Forms.Button btnRunSearch;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox cbStopEarly;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 
