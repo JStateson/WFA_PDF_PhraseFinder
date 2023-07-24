@@ -61,12 +61,22 @@ namespace WFA_PDF_PhraseFinder.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sat 07/22/2023 16:16:39.52 
+        ///   Looks up a localized string similar to Mon 07/24/2023 11:57:25.51 
         ///.
         /// </summary>
         internal static string BuildDate {
             get {
                 return ResourceManager.GetString("BuildDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon usda {
+            get {
+                object obj = ResourceManager.GetObject("usda", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }
