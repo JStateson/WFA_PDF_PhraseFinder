@@ -106,7 +106,7 @@ namespace WFA_PDF_PhraseFinder
 
         List<cPhraseTable> phlist = new List<cPhraseTable>();   // table of phrases
         cLocalSettings LocalSettings = new cLocalSettings();    // table of settings
-        CAcroApp acroApp = new AcroAppClass();
+        CAcroApp acroApp;
 
         //string[] InitialPhrase = new string[NumPhrases] { " prorated ", " lender & grant ", " lender", " grant ", " contract & school & lunches " };
         // the above using "&" was not implementable because I was unable to read a line and know that two words were on the
@@ -339,6 +339,15 @@ namespace WFA_PDF_PhraseFinder
         public Form1()
         {
             InitializeComponent();
+            try
+            {
+                acroApp = new AcroAppClass();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Adobe PRO or STANDARD is not present");
+                this.Close();
+            }
             scSavedWords = new StringCollection();
             int n = 0;
             if( null != Properties.Settings.Default.SearchPhrases)
