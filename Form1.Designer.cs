@@ -54,7 +54,6 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ofd = new System.Windows.Forms.OpenFileDialog();
             this.tbMatches = new System.Windows.Forms.TextBox();
@@ -77,7 +76,7 @@
             this.textBox1.Location = new System.Drawing.Point(767, 12);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(279, 96);
+            this.textBox1.Size = new System.Drawing.Size(279, 129);
             this.textBox1.TabIndex = 3;
             this.textBox1.Text = resources.GetString("textBox1.Text");
             // 
@@ -115,6 +114,7 @@
             this.cbStopEarly.TabIndex = 0;
             this.toolTip1.SetToolTip(this.cbStopEarly, "Used for testing ");
             this.cbStopEarly.UseVisualStyleBackColor = true;
+            this.cbStopEarly.CheckedChanged += new System.EventHandler(this.cbStopEarly_CheckedChanged);
             // 
             // tbPdfName
             // 
@@ -184,7 +184,7 @@
             this.groupBox4.Size = new System.Drawing.Size(126, 85);
             this.groupBox4.TabIndex = 11;
             this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Cliopboard / Notepad";
+            this.groupBox4.Text = "Clipboard / Notepad";
             this.toolTip1.SetToolTip(this.groupBox4, "Copy to;.from cliipboard");
             // 
             // btnImport
@@ -308,7 +308,6 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
-            this.closeToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -318,21 +317,14 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click_1);
-            // 
-            // closeToolStripMenuItem
-            // 
-            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-            this.closeToolStripMenuItem.Text = "Close";
-            this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -351,7 +343,7 @@
             // 
             // pbarLoading
             // 
-            this.pbarLoading.Location = new System.Drawing.Point(767, 131);
+            this.pbarLoading.Location = new System.Drawing.Point(767, 156);
             this.pbarLoading.Name = "pbarLoading";
             this.pbarLoading.Size = new System.Drawing.Size(279, 23);
             this.pbarLoading.TabIndex = 12;
@@ -386,6 +378,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "USDA / FNS";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.gbPDFname.ResumeLayout(false);
             this.gbPDFname.PerformLayout();
             this.groupBox3.ResumeLayout(false);
@@ -419,7 +412,6 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog ofd;
         private System.Windows.Forms.DataGridView dgv_phrases;

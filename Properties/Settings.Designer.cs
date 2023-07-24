@@ -33,5 +33,29 @@ namespace WFA_PDF_PhraseFinder.Properties {
                 this["SearchPhrases"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool lsExitEarly {
+            get {
+                return ((bool)(this["lsExitEarly"]));
+            }
+            set {
+                this["lsExitEarly"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lsLastFolder {
+            get {
+                return ((string)(this["lsLastFolder"]));
+            }
+            set {
+                this["lsLastFolder"] = value;
+            }
+        }
     }
 }

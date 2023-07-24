@@ -15,12 +15,22 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Acrobat;
 using AFORMAUTLib;
+using Microsoft.Win32;
 using WFA_PDF_PhraseFinder.Properties;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
+// data mining PDF appplication
+// copyright 2023, Joseph Stateson  github/jstateson  
 
-//author below is expert on PDF programming
-//http://khkonsulting.com/2014/04/extract-pdf-pages-based-content/
+/*
+ Program search for phrases in a PDF.  Adobe pro seems to be needed for the app to work
+ The searching is done by looking at whole words extracted from a PDF.  The page the word or
+ phrase was found on is displayed.  A count of the number of matching phrases is listed.
+ This program was written as a concept with the idea that the phrases might be highlighted
+ in a new document so that the use can then look at the new document and quickly locate
+ what was written.
+*/
+
 
 namespace WFA_PDF_PhraseFinder
 {
@@ -32,6 +42,11 @@ namespace WFA_PDF_PhraseFinder
         public IFields theseFields = null;
         private bool bFormDirty = false;
         private StringCollection scSavedWords;
+        private class cLocalSettings         // used to restore user settings
+        {
+            public bool bExitEarly;         // for debugging or demo purpose only examine a limited number of page
+            public string strLastFolder;    // where last PDF was obtained
+        }
 
         private class cPhraseTable
         {
@@ -45,7 +60,8 @@ namespace WFA_PDF_PhraseFinder
             public string[] strInSeries;
             public int nFollowing; // number of words to check in sequence
 
-            private int CountWords(string strIn) // count the number of following words that must match
+            // count the number of following words that must match
+            private int CountWords(string strIn)
             {
                 char[] delimiters = new char[] { ' ', '\r', '\n' };
                 strInSeries = strIn.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
@@ -88,11 +104,17 @@ namespace WFA_PDF_PhraseFinder
             }
         }
 
-        List<cPhraseTable> phlist = new List<cPhraseTable>();
-        //string[] InitialPhrase = new string[NumPhrases] { " prorated ", " lender & grant ", " lender", " grant ", " contract & school & lunches " };
-        string[] InitialPhrase = new string[5] { "and", "address", "make sure", "motherboard", "memory" };
-        string[] WorkingPhrases = new string[5];
+        List<cPhraseTable> phlist = new List<cPhraseTable>();   // table of phrases
+        cLocalSettings LocalSettings = new cLocalSettings();    // table of settings
+        CAcroApp acroApp = new AcroAppClass();
 
+        //string[] InitialPhrase = new string[NumPhrases] { " prorated ", " lender & grant ", " lender", " grant ", " contract & school & lunches " };
+        // the above using "&" was not implementable because I was unable to read a line and know that two words were on the
+        // same line.  Since the SDK retrieves whole words there is no need for a space before or after a phrase
+        string[] InitialPhrase = new string[5] { "and", "address", "make sure", "motherboard", "memory" };
+        string[] WorkingPhrases = new string[5]; // same as above but optomises somewhat for case sensitivity
+
+        //show a simple date on the form
         private string GetSimpleDate(string sDT)
         {
             //Sun 06/09/2019 23:33:53.18 
@@ -103,7 +125,7 @@ namespace WFA_PDF_PhraseFinder
         }
         
         // must have at least 2 letters
-        bool bMatchWord(string word, int iPage,int jMax, ref int jWord, ref bool bError)
+        bool bMatchWord(string word, int iPage, int jMax, ref int jWord, ref bool bError)
         {
             int n;
             string strTemp = "";
@@ -123,14 +145,17 @@ namespace WFA_PDF_PhraseFinder
                         return true;
                     }
                     // need to check the following words of the phrase
+                    // workingphrases do not have the "following words" so had to index into phlist
+                    // was trying to optimise the matching by not haveing to adjust case all the time
+                    // but didnt think this out too clearly so had to use phlist for more than 1 word
                     for(int j = 0; j < n; j++)
                     {
                         jWord++;
-                        if (jWord == jMax) return false;
-                        word = GetThisWord(jWord, jMax, iPage, ref bError);
-                        if (bError) return false;
+                        if (jWord == jMax) return false; // do not read past the end of the page or document
+                        word = GetThisWord(jWord, jMax, iPage, ref bError); //need to peek for the next word
+                        if (bError) return false; // some PDFs are corrupted I discovered
                         if(cbIgnoreCase.Checked)word = word.ToLower();
-                        strTemp = phlist[i].strInSeries[j+1];
+                        strTemp = phlist[i].strInSeries[j+1]; // the phlist first word was already checked
                         if (cbIgnoreCase.Checked) strTemp = strTemp.ToLower();
                         if (strTemp != word) return false;
                     }
@@ -142,6 +167,7 @@ namespace WFA_PDF_PhraseFinder
             return false;
         }
 
+        // count number of words in the phrase
         private long GetMatchCount()
         {
             long lCnt = 0;
@@ -154,6 +180,7 @@ namespace WFA_PDF_PhraseFinder
             return lCnt;
         }
 
+        //progress bar
         private void SetPBAR(int p)
         {
             double pbarSlope =  pbarLoading.Maximum * p;
@@ -164,7 +191,6 @@ namespace WFA_PDF_PhraseFinder
             Application.DoEvents();
         }
 
-
         private void IncrementPBAR()
         {
             pbarLoading.PerformStep();
@@ -173,6 +199,8 @@ namespace WFA_PDF_PhraseFinder
             Application.DoEvents();
         }
 
+        //open file needs adobe professional (not always found) in addition to badly formed PDFs
+        // i need to give warning if PRO is not on the system
         private bool bOpenDocs(string strPath)
         {
             try
@@ -185,7 +213,7 @@ namespace WFA_PDF_PhraseFinder
             }
             catch
             {
-                tbPdfName.Text = "bad PDF file:" + tbPdfName.Text;
+                tbPdfName.Text = "missing Adobe DLL or file:" + tbPdfName.Text;
                 return false;
             }
             return true;
@@ -201,13 +229,14 @@ namespace WFA_PDF_PhraseFinder
             }
             catch
             {
-                MessageBox.Show(" error in PDF page " + iCurrentPage);
+                MessageBox.Show("Error in PDF at page " + iCurrentPage);
                 bError = true;
                 return "";
             }
             return chkWord;
         }
 
+        // this starts the search.  note that the file is closed after the search
         private bool RunSearch()
         {
             string strPath = tbPdfName.Text;
@@ -273,7 +302,9 @@ namespace WFA_PDF_PhraseFinder
             return true;
         }
 
-
+        // fill in the phrase table list from the initial (hard coded) list
+        // the hard coded list is automatically replaced by any saved list
+        // from windows resource or via the import feature
         private void FillPhrases()
         {
             cPhraseTable cpt;
@@ -287,6 +318,7 @@ namespace WFA_PDF_PhraseFinder
             dgv_phrases.DataSource = phlist.ToArray();                    
         }
 
+        //the phrase list is saved into windows AppData 
         private void SaveSettings()
         {
             // should be at AppData\Local\Microsoft\YOUR APPLICATION NAME File name is user.config
@@ -299,6 +331,11 @@ namespace WFA_PDF_PhraseFinder
             Properties.Settings.Default.Save();
         }
 
+        // should have given the form a better name but I suspect it is too late
+        /// <summary>
+        /// if AppData contains a list of phrases that list is used in place of the hard coded list
+        /// if there is no saved list then the hard coded one is saved
+        /// </summary>
         public Form1()
         {
             InitializeComponent();
@@ -324,17 +361,22 @@ namespace WFA_PDF_PhraseFinder
                 SaveSettings();
             }
             FillPhrases();
-            tbPdfName.Text = "Build date: " + GetSimpleDate(Properties.Resources.BuildDate) + " (v) 1.0 Stateson";
+            GetLocalSettings();
+            tbPdfName.Text = "Build date: " + GetSimpleDate(Properties.Resources.BuildDate) + " (v) 1.0 (c)Stateson";
+            //AdobePresent();
         }
 
 
-
+        /// <summary>
+        /// this opens the PDF and it is always closed so no need (?) for a close button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            string str_LookHere = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             ofd = new OpenFileDialog();
             ofd.DefaultExt = "*pdf";
-            ofd.InitialDirectory = str_LookHere;
+            ofd.InitialDirectory = LocalSettings.strLastFolder;
             ofd.Filter = "(Adobe PDF)|*.pdf";
 
             if (DialogResult.OK != ofd.ShowDialog())
@@ -344,14 +386,17 @@ namespace WFA_PDF_PhraseFinder
                 return;
             }
             tbPdfName.Text = ofd.FileName;
+            LocalSettings.strLastFolder = Path.GetDirectoryName(ofd.FileName);
             if(bFormDirty)
             {
                 FillPhrases();
                 bFormDirty = false;
             }
+            // enable the run button if a docuement was loaded
             btnRunSearch.Enabled =  bOpenDocs(tbPdfName.Text);
         }
 
+        //close was not needed as the file is opened and closed after every search
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -404,6 +449,8 @@ namespace WFA_PDF_PhraseFinder
             btnRunSearch.Enabled = true;
         }
 
+        // the phrase list was edited so copy the edits so they can be saved
+        // the searching is done using using the InitialPhrase list
         private void UpdateSettings()
         {
             for (int i = 0; i < NumPhrases; i++)
@@ -419,6 +466,8 @@ namespace WFA_PDF_PhraseFinder
             SaveSettings();
         }
 
+        // a made up phrase is inserted into phlist and the user
+        // needs to edit that and must also save it (if desired)
         private void btnAdd_Click(object sender, EventArgs e)
         {
             int n = InitialPhrase.Length + 1;
@@ -434,6 +483,7 @@ namespace WFA_PDF_PhraseFinder
             FillPhrases();
         }
 
+        // any phrases selected are deleted but the user needs to save the edits
         private void btnRemove_Click(object sender, EventArgs e)
         {
             int j=0, n = 0;
@@ -441,12 +491,12 @@ namespace WFA_PDF_PhraseFinder
                 if (phlist[i].Select)
                     n++;
             DialogResult dialogResult = MessageBox.Show(
-                "This operation will delete " + n + " files.  Are you sure?", 
-                "Warning", MessageBoxButtons.YesNo);
+                "This operation will delete " + n + " filter phrases.  Are you sure?", 
+                "Warning: don't forget to save", MessageBoxButtons.YesNo);
 
             if (dialogResult == DialogResult.Yes)
             {
-                //remove items from phlist
+                //remove items from phlist and put into a new InitialPhrase list
                 n = NumPhrases - n; // this many to keep
                 WorkingPhrases = new string[n];
                 for (int i = 0; i < NumPhrases; i++)
@@ -468,6 +518,7 @@ namespace WFA_PDF_PhraseFinder
 
         }
 
+        // copy the phrases onto the windows clipboard
         private void btnExport_Click(object sender, EventArgs e)
         {
             string strOut = "";
@@ -478,6 +529,7 @@ namespace WFA_PDF_PhraseFinder
             System.Windows.Forms.Clipboard.SetText(strOut);
         }
 
+        //import phrases from the windows clipboard
         private void btnImport_Click(object sender, EventArgs e)
         {
             string strTemp = System.Windows.Forms.Clipboard.GetText();
@@ -495,6 +547,63 @@ namespace WFA_PDF_PhraseFinder
                 InitialPhrase[i] = strTemps[i];
             }
             FillPhrases();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SaveLocalSettings();
+        }
+
+        private void SaveLocalSettings()
+        {
+            Properties.Settings.Default.lsExitEarly = LocalSettings.bExitEarly;
+            Properties.Settings.Default.lsLastFolder = LocalSettings.strLastFolder;
+            Properties.Settings.Default.Save();
+        }
+
+        private void GetLocalSettings()
+        {
+            LocalSettings.bExitEarly = Properties.Settings.Default.lsExitEarly;
+            LocalSettings.strLastFolder = Properties.Settings.Default.lsLastFolder;
+            cbStopEarly.Checked = LocalSettings.bExitEarly;
+            if (LocalSettings.strLastFolder == "")
+            {
+                LocalSettings.strLastFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                SaveLocalSettings();
+            }
+        }
+
+        private bool AdobePresent()
+        {
+
+            RegistryKey adobe = Registry.LocalMachine.OpenSubKey("Software").OpenSubKey("Adobe");
+            if (null == adobe)
+            {
+                var policies = Registry.LocalMachine.OpenSubKey("Software").OpenSubKey("Policies");
+                if (null == policies)
+                    return false ;
+                adobe = policies.OpenSubKey("Adobe");
+            }
+            if (adobe != null)
+            {
+                RegistryKey acroRead = adobe.OpenSubKey("Adobe Acrobat");
+                if (acroRead != null)
+                {
+                    string[] acroReadVersions = acroRead.GetSubKeyNames();
+                    string strTemp = "The following version(s) of Acrobat Reader are installed:\r\n ";
+                    foreach (string versionNumber in acroReadVersions)
+                    {
+                        strTemp += versionNumber + "\r\n";
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private void cbStopEarly_CheckedChanged(object sender, EventArgs e)
+        {
+            LocalSettings.bExitEarly = cbStopEarly.Checked;
         }
 
         private void fileToolStripMenuItem_Click(object sender, EventArgs e)

@@ -122,8 +122,11 @@
 Click the run button to start a search
 Only phrases checked wil be used
 Click Add Phrase to add a phrase
-Click Remove Phrase to remvoe selected phrases
-Click SAVE to save your phrases</value>
+Click Remove Phrase to remove selected phrases
+Click SAVE to save your phrases
+Export/Import is to the clipboard.  Use the
+copy and paste functions in notepad to
+access your clippings</value>
   </data>
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>202, 17</value>
