@@ -1,5 +1,5 @@
 # WFA_PDF_PhraseFinder
-Looks for words or phrases in a pdf
+Concepot app that looks for words or phrases in a pdf
 
 reports the page number and count of the occurrences
 
