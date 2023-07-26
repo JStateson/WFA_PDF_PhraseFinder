@@ -252,7 +252,7 @@ namespace WFA_PDF_PhraseFinder
             ThisDoc.SetViewMode(2); // PDUseThumbs
             ThisDocView = ThisDoc.GetAVPageView() as CAcroAVPageView;
             //pageView.ZoomTo(1 /*AVZoomFitPage*/, 100);
-            ThisDocView.GoTo(iCurrentPage);
+            ThisDocView.GoTo(iCurrentPage-1);
         }
 
         // this starts the search.  note that the file is closed after the search
@@ -667,7 +667,7 @@ namespace WFA_PDF_PhraseFinder
             tbViewPage.Text = iCurrentPage.ToString();
             if (ThisDocView != null)
             {
-                ThisDocView.GoTo(iCurrentPage);
+                ThisDocView.GoTo(iCurrentPage-1);
             }
         }
 
