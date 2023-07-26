@@ -7,12 +7,15 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using Acrobat;
 using AFORMAUTLib;
 using Microsoft.Win32;
@@ -27,8 +30,14 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
  The searching is done by looking at whole words extracted from a PDF.  The page the word or
  phrase was found on is displayed.  A count of the number of matching phrases is listed.
  This program was written as a concept with the idea that the phrases might be highlighted
- in a new document so that the use can then look at the new document and quickly locate
+ in a new ThisDoc so that the use can then look at the new ThisDoc and quickly locate
  what was written.
+notes follow
+setpage: C:\Program Files (x86)\Adobe\Acrobat 2015\Acrobat>acrobat /A "page=10" d:\msi-x299-raider.pdf
+using itext(C#): https://dev.to/eliotjones/reading-a-pdf-in-c-on-net-core-43ef
+get current page https://stackoverflow.com/questions/32450906/get-current-page-in-a-pdf-in-windows-application
+set bookmark PDFView.initialBookmark = "page=5";
+nice https://csharp.hotexamples.com/examples/-/AcroAVDoc/-/php-acroavdoc-class-examples.html
 */
 
 
@@ -36,6 +45,12 @@ namespace WFA_PDF_PhraseFinder
 {
     public partial class Form1 : Form
     {
+        CAcroApp acroApp;
+        AcroAVDoc ThisDoc;
+        CAcroAVPageView ThisDocView;
+        int[] ThisPageList = null;
+        int iCurrentPage=0;
+        bool bThisDocOpen = false;
 
         private int NumPhrases = 5;
         private long TotalPDFPages, TotalMatches;
@@ -80,8 +95,9 @@ namespace WFA_PDF_PhraseFinder
                 Phrase = aPhrase;
                 nFollowing = CountWords(aPhrase);
             }
-            public void AddPage(int iPage) // do not add the same page twice
+            public void AddPage(int jPage) // do not add the same page twice
             {
+                int iPage = jPage + 1;
                 if (strPages == "")
                 {
                     strPages = iPage.ToString();
@@ -106,7 +122,7 @@ namespace WFA_PDF_PhraseFinder
 
         List<cPhraseTable> phlist = new List<cPhraseTable>();   // table of phrases
         cLocalSettings LocalSettings = new cLocalSettings();    // table of settings
-        CAcroApp acroApp;
+
 
         //string[] InitialPhrase = new string[NumPhrases] { " prorated ", " lender & grant ", " lender", " grant ", " contract & school & lunches " };
         // the above using "&" was not implementable because I was unable to read a line and know that two words were on the
@@ -151,7 +167,7 @@ namespace WFA_PDF_PhraseFinder
                     for(int j = 0; j < n; j++)
                     {
                         jWord++;
-                        if (jWord == jMax) return false; // do not read past the end of the page or document
+                        if (jWord == jMax) return false; // do not read past the end of the page or ThisDoc
                         word = GetThisWord(jWord, jMax, iPage, ref bError); //need to peek for the next word
                         if (bError) return false; // some PDFs are corrupted I discovered
                         if(cbIgnoreCase.Checked)word = word.ToLower();
@@ -186,14 +202,6 @@ namespace WFA_PDF_PhraseFinder
             double pbarSlope =  pbarLoading.Maximum * p;
             pbarSlope /= TotalPDFPages;
             pbarLoading.Value = Convert.ToInt32( pbarSlope);
-            pbarLoading.Update();
-            pbarLoading.Refresh();
-            Application.DoEvents();
-        }
-
-        private void IncrementPBAR()
-        {
-            pbarLoading.PerformStep();
             pbarLoading.Update();
             pbarLoading.Refresh();
             Application.DoEvents();
@@ -236,6 +244,17 @@ namespace WFA_PDF_PhraseFinder
             return chkWord;
         }
 
+        private void ViewDoc(string fileName)
+        {
+            ThisDoc = new AcroAVDoc();
+            ThisDoc.Open(fileName, "");
+            ThisDoc.BringToFront();
+            ThisDoc.SetViewMode(2); // PDUseThumbs
+            ThisDocView = ThisDoc.GetAVPageView() as CAcroAVPageView;
+            //pageView.ZoomTo(1 /*AVZoomFitPage*/, 100);
+            ThisDocView.GoTo(iCurrentPage);
+        }
+
         // this starts the search.  note that the file is closed after the search
         private bool RunSearch()
         {
@@ -254,7 +273,7 @@ namespace WFA_PDF_PhraseFinder
                 tbPdfName.Text = "corrupt pdf:" + tbPdfName.Text;
                 return false;
             }
-
+            //DocTest(strPath);
             string OutText = "";
             string chkWord = "";
             TotalMatches = 0;
@@ -282,6 +301,7 @@ namespace WFA_PDF_PhraseFinder
                     }
                 }
             }
+            SetPBAR(0);
             for(int i = 0; i < NumPhrases;i++)
             {
                 if (phlist[i].iNumber > 0)
@@ -299,6 +319,7 @@ namespace WFA_PDF_PhraseFinder
             formApp = null;
             dgv_phrases.DataSource = phlist.ToArray();
             bFormDirty = true;
+            gbPageCtrl.Visible = TotalMatches > 0;  // show page control only if matches found
             return true;
         }
 
@@ -613,6 +634,46 @@ namespace WFA_PDF_PhraseFinder
         private void cbStopEarly_CheckedChanged(object sender, EventArgs e)
         {
             LocalSettings.bExitEarly = cbStopEarly.Checked;
+        }
+
+        private void GetSelection()
+        {
+            //DataGridViewRow ThisRow = dgv_phrases.CurrentRow;
+            Point ThisRC = dgv_phrases.CurrentCellAddress;
+            int iRow = ThisRC.Y;
+            int iCol = ThisRC.X;
+            ThisPageList = phlist[iRow].strPages.Split(',').Select(int.Parse).ToArray();
+            nudPage.Maximum = ThisPageList.Length - 1;
+            tbViewPage.Text = ThisPageList[0].ToString();
+        }
+
+        private void dgv_phrases_SelectionChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dgv_phrases_Click(object sender, EventArgs e)
+        {
+            GetSelection();
+        }
+
+
+
+        private void nudPage_ValueChanged(object sender, EventArgs e)
+        {
+            if (ThisPageList == null) return;
+            int iVal = Convert.ToInt32(nudPage.Value);
+            iCurrentPage = ThisPageList[iVal];
+            tbViewPage.Text = iCurrentPage.ToString();
+            if (ThisDocView != null)
+            {
+                ThisDocView.GoTo(iCurrentPage);
+            }
+        }
+
+        private void btnViewDoc_Click(object sender, EventArgs e)
+        {
+            ViewDoc(tbPdfName.Text);
         }
 
         private void fileToolStripMenuItem_Click(object sender, EventArgs e)

@@ -60,6 +60,10 @@
             this.pbarLoading = new System.Windows.Forms.ProgressBar();
             this.btnRunSearch = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.gbPageCtrl = new System.Windows.Forms.GroupBox();
+            this.tbViewPage = new System.Windows.Forms.TextBox();
+            this.nudPage = new System.Windows.Forms.NumericUpDown();
+            this.btnViewDoc = new System.Windows.Forms.Button();
             this.gbPDFname.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -68,6 +72,8 @@
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgv_phrases)).BeginInit();
             this.menuStrip1.SuspendLayout();
+            this.gbPageCtrl.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPage)).BeginInit();
             this.SuspendLayout();
             // 
             // textBox1
@@ -76,7 +82,7 @@
             this.textBox1.Location = new System.Drawing.Point(767, 12);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(279, 129);
+            this.textBox1.Size = new System.Drawing.Size(279, 142);
             this.textBox1.TabIndex = 3;
             this.textBox1.Text = resources.GetString("textBox1.Text");
             // 
@@ -218,6 +224,8 @@
             this.dgv_phrases.Size = new System.Drawing.Size(333, 356);
             this.dgv_phrases.TabIndex = 10;
             this.toolTip1.SetToolTip(this.dgv_phrases, " You may edit the text field but be sure tos save your edits");
+            this.dgv_phrases.SelectionChanged += new System.EventHandler(this.dgv_phrases_SelectionChanged);
+            this.dgv_phrases.Click += new System.EventHandler(this.dgv_phrases_Click);
             // 
             // btnSave
             // 
@@ -317,14 +325,14 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click_1);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -338,12 +346,12 @@
             this.tbMatches.Multiline = true;
             this.tbMatches.Name = "tbMatches";
             this.tbMatches.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbMatches.Size = new System.Drawing.Size(396, 311);
+            this.tbMatches.Size = new System.Drawing.Size(396, 265);
             this.tbMatches.TabIndex = 11;
             // 
             // pbarLoading
             // 
-            this.pbarLoading.Location = new System.Drawing.Point(767, 156);
+            this.pbarLoading.Location = new System.Drawing.Point(704, 169);
             this.pbarLoading.Name = "pbarLoading";
             this.pbarLoading.Size = new System.Drawing.Size(279, 23);
             this.pbarLoading.TabIndex = 12;
@@ -362,11 +370,53 @@
             this.btnRunSearch.UseVisualStyleBackColor = true;
             this.btnRunSearch.Click += new System.EventHandler(this.btnRunSearch_Click);
             // 
+            // gbPageCtrl
+            // 
+            this.gbPageCtrl.Controls.Add(this.tbViewPage);
+            this.gbPageCtrl.Controls.Add(this.nudPage);
+            this.gbPageCtrl.Controls.Add(this.btnViewDoc);
+            this.gbPageCtrl.Location = new System.Drawing.Point(650, 507);
+            this.gbPageCtrl.Name = "gbPageCtrl";
+            this.gbPageCtrl.Size = new System.Drawing.Size(379, 88);
+            this.gbPageCtrl.TabIndex = 14;
+            this.gbPageCtrl.TabStop = false;
+            this.gbPageCtrl.Text = "Page View Control";
+            this.gbPageCtrl.Visible = false;
+            // 
+            // tbViewPage
+            // 
+            this.tbViewPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbViewPage.Location = new System.Drawing.Point(254, 29);
+            this.tbViewPage.Name = "tbViewPage";
+            this.tbViewPage.Size = new System.Drawing.Size(56, 29);
+            this.tbViewPage.TabIndex = 19;
+            // 
+            // nudPage
+            // 
+            this.nudPage.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.nudPage.Location = new System.Drawing.Point(206, 29);
+            this.nudPage.Name = "nudPage";
+            this.nudPage.Size = new System.Drawing.Size(16, 31);
+            this.nudPage.TabIndex = 18;
+            this.nudPage.ValueChanged += new System.EventHandler(this.nudPage_ValueChanged);
+            // 
+            // btnViewDoc
+            // 
+            this.btnViewDoc.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnViewDoc.Location = new System.Drawing.Point(69, 29);
+            this.btnViewDoc.Name = "btnViewDoc";
+            this.btnViewDoc.Size = new System.Drawing.Size(113, 31);
+            this.btnViewDoc.TabIndex = 17;
+            this.btnViewDoc.Text = "ViewDoc";
+            this.btnViewDoc.UseVisualStyleBackColor = true;
+            this.btnViewDoc.Click += new System.EventHandler(this.btnViewDoc_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1072, 624);
+            this.Controls.Add(this.gbPageCtrl);
             this.Controls.Add(this.btnRunSearch);
             this.Controls.Add(this.pbarLoading);
             this.Controls.Add(this.tbMatches);
@@ -393,6 +443,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgv_phrases)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.gbPageCtrl.ResumeLayout(false);
+            this.gbPageCtrl.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudPage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -429,6 +482,10 @@
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Button btnImport;
         private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.GroupBox gbPageCtrl;
+        private System.Windows.Forms.TextBox tbViewPage;
+        private System.Windows.Forms.NumericUpDown nudPage;
+        private System.Windows.Forms.Button btnViewDoc;
     }
 }
 
