@@ -224,7 +224,6 @@
             this.dgv_phrases.Size = new System.Drawing.Size(333, 356);
             this.dgv_phrases.TabIndex = 10;
             this.toolTip1.SetToolTip(this.dgv_phrases, " You may edit the text field but be sure tos save your edits");
-            this.dgv_phrases.SelectionChanged += new System.EventHandler(this.dgv_phrases_SelectionChanged);
             this.dgv_phrases.Click += new System.EventHandler(this.dgv_phrases_Click);
             // 
             // btnSave
@@ -320,7 +319,6 @@
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
-            this.fileToolStripMenuItem.Click += new System.EventHandler(this.fileToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
@@ -390,6 +388,7 @@
             this.tbViewPage.Name = "tbViewPage";
             this.tbViewPage.Size = new System.Drawing.Size(56, 29);
             this.tbViewPage.TabIndex = 19;
+            this.tbViewPage.Visible = false;
             // 
             // nudPage
             // 
@@ -398,6 +397,7 @@
             this.nudPage.Name = "nudPage";
             this.nudPage.Size = new System.Drawing.Size(16, 31);
             this.nudPage.TabIndex = 18;
+            this.nudPage.Visible = false;
             this.nudPage.ValueChanged += new System.EventHandler(this.nudPage_ValueChanged);
             // 
             // btnViewDoc

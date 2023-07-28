@@ -29,9 +29,16 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
  Program search for phrases in a PDF.  Adobe pro seems to be needed for the app to work
  The searching is done by looking at whole words extracted from a PDF.  The page the word or
  phrase was found on is displayed.  A count of the number of matching phrases is listed.
+ The adobe sdk is required. 
  This program was written as a concept with the idea that the phrases might be highlighted
- in a new ThisDoc so that the use can then look at the new ThisDoc and quickly locate
+ in a new ThisDoc so that the use can then look at the new This Doc and quickly locate
  what was written.
+
+
+program was written using window forms app. I used the older frameworks by mistake
+https://stackoverflow.com/questions/65304110/difference-between-windows-forms-app-vs-windows-forms-app-net-framework
+
+
 notes follow
 setpage: C:\Program Files (x86)\Adobe\Acrobat 2015\Acrobat>acrobat /A "page=10" d:\msi-x299-raider.pdf
 using itext(C#): https://dev.to/eliotjones/reading-a-pdf-in-c-on-net-core-43ef
@@ -45,16 +52,16 @@ namespace WFA_PDF_PhraseFinder
 {
     public partial class Form1 : Form
     {
-        CAcroApp acroApp;
-        AcroAVDoc ThisDoc;
-        CAcroAVPageView ThisDocView;
-        int[] ThisPageList = null;
-        int iCurrentPage=0;
-        bool bThisDocOpen = false;
+        private CAcroApp acroApp;
+        private AcroAVDoc ThisDoc;
+        private CAcroAVPageView ThisDocView;
+        private int[] ThisPageList = null;
+        private int iCurrentPage=0;
+        private bool bThisDocOpen = false;
 
         private int NumPhrases = 5;
         private long TotalPDFPages, TotalMatches;
-        public IFields theseFields = null;
+        private IFields theseFields = null;
         private bool bFormDirty = false;
         private StringCollection scSavedWords;
         private class cLocalSettings         // used to restore user settings
@@ -120,15 +127,15 @@ namespace WFA_PDF_PhraseFinder
             }
         }
 
-        List<cPhraseTable> phlist = new List<cPhraseTable>();   // table of phrases
-        cLocalSettings LocalSettings = new cLocalSettings();    // table of settings
+        private List<cPhraseTable> phlist = new List<cPhraseTable>();   // table of phrases
+        private cLocalSettings LocalSettings = new cLocalSettings();    // table of settings
 
 
         //string[] InitialPhrase = new string[NumPhrases] { " prorated ", " lender & grant ", " lender", " grant ", " contract & school & lunches " };
         // the above using "&" was not implementable because I was unable to read a line and know that two words were on the
         // same line.  Since the SDK retrieves whole words there is no need for a space before or after a phrase
-        string[] InitialPhrase = new string[5] { "and", "address", "make sure", "motherboard", "memory" };
-        string[] WorkingPhrases = new string[5]; // same as above but optomises somewhat for case sensitivity
+        private string[] InitialPhrase = new string[5] { "and", "address", "make sure", "motherboard", "memory" };
+        private string[] WorkingPhrases = new string[5]; // same as above but optomises somewhat for case sensitivity
 
         //show a simple date on the form
         private string GetSimpleDate(string sDT)
@@ -141,7 +148,7 @@ namespace WFA_PDF_PhraseFinder
         }
         
         // must have at least 2 letters
-        bool bMatchWord(string word, int iPage, int jMax, ref int jWord, ref bool bError)
+        private bool bMatchWord(string word, int iPage, int jMax, ref int jWord, ref bool bError)
         {
             int n;
             string strTemp = "";
@@ -301,7 +308,7 @@ namespace WFA_PDF_PhraseFinder
                     }
                 }
             }
-            SetPBAR(0);
+            SetPBAR(0);   // clear the progress bar
             for(int i = 0; i < NumPhrases;i++)
             {
                 if (phlist[i].iNumber > 0)
@@ -319,7 +326,7 @@ namespace WFA_PDF_PhraseFinder
             formApp = null;
             dgv_phrases.DataSource = phlist.ToArray();
             bFormDirty = true;
-            gbPageCtrl.Visible = TotalMatches > 0;  // show page control only if matches found
+            gbPageCtrl.Visible = TotalMatches > 0;  // show page control group only if matches found
             return true;
         }
 
@@ -603,6 +610,12 @@ namespace WFA_PDF_PhraseFinder
             }
         }
 
+        /// <summary>
+        /// This was supposed to check to to see if the license expired but it was not usefull
+        /// was easier to use the "try" and report an error if cannot open Adobe pro
+        /// It did not work for that matter
+        /// </summary>
+        /// <returns></returns>
         private bool AdobePresent()
         {
 
@@ -631,11 +644,21 @@ namespace WFA_PDF_PhraseFinder
             return false;
         }
 
+        /// <summary>
+        /// user changed the status of the stop early switch
+        /// this can be used to stop reading more pages of a PDF
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cbStopEarly_CheckedChanged(object sender, EventArgs e)
         {
             LocalSettings.bExitEarly = cbStopEarly.Checked;
         }
 
+        /// <summary>
+        /// Get the list of pages that contains the wanted phrase and update the
+        /// numeric up/down widget so the pages can be scrolled
+        /// </summary>
         private void GetSelection()
         {
             //DataGridViewRow ThisRow = dgv_phrases.CurrentRow;
@@ -644,19 +667,35 @@ namespace WFA_PDF_PhraseFinder
             int iCol = ThisRC.X;
             ThisPageList = phlist[iRow].strPages.Split(',').Select(int.Parse).ToArray();
             nudPage.Maximum = ThisPageList.Length - 1;
+            iCurrentPage = -1;
             tbViewPage.Text = ThisPageList[0].ToString();
+            tbViewPage.Visible = ThisPageList.Length > 0;   // only show page number of there are pages
+            if (tbViewPage.Visible)
+                iCurrentPage = ThisPageList[0];
+            nudPage.Visible = ThisPageList.Length > 1;      // only show numeric up/down if more than 1 page
         }
 
-        private void dgv_phrases_SelectionChanged(object sender, EventArgs e)
-        {
 
-        }
 
         private void dgv_phrases_Click(object sender, EventArgs e)
         {
             GetSelection();
         }
 
+
+        private void ViewSelectedPage()
+        {
+            if (iCurrentPage < 0) return;
+            try
+            {
+                ThisDocView.GoTo(iCurrentPage - 1);
+            }
+            catch
+            {
+                // page probably closed by user: they can re-open it
+            }
+
+        }
 
 
         private void nudPage_ValueChanged(object sender, EventArgs e)
@@ -667,18 +706,13 @@ namespace WFA_PDF_PhraseFinder
             tbViewPage.Text = iCurrentPage.ToString();
             if (ThisDocView != null)
             {
-                ThisDocView.GoTo(iCurrentPage-1);
+                ViewSelectedPage();
             }
         }
 
         private void btnViewDoc_Click(object sender, EventArgs e)
         {
             ViewDoc(tbPdfName.Text);
-        }
-
-        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
         }
 
     }
