@@ -35,10 +35,10 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
  what was written.
 
 
-program was written using window forms app. I used the older frameworks by mistake
+program was written using window forms app. I used the older frameworks because that was what 
+the adobe SDK uses.  In addition, NuGet works only with frameworks and itext uses NuGet
 https://stackoverflow.com/questions/65304110/difference-between-windows-forms-app-vs-windows-forms-app-net-framework
-
-
+https://learn.microsoft.com/en-us/dotnet/standard/choosing-core-framework-server
 notes follow
 setpage: C:\Program Files (x86)\Adobe\Acrobat 2015\Acrobat>acrobat /A "page=10" d:\msi-x299-raider.pdf
 using itext(C#): https://dev.to/eliotjones/reading-a-pdf-in-c-on-net-core-43ef
@@ -324,7 +324,6 @@ namespace WFA_PDF_PhraseFinder
                     jWord++;
                     if (jWord == numWords) break;
                     chkWord = GetThisWord(jWord, numWords, p, ref bError);
-                    if (bError) return false;
                     if (bError) return false;
                     if(bMatchWord(chkWord,p,numWords, ref jWord, ref bError))
                     {
@@ -659,14 +658,17 @@ namespace WFA_PDF_PhraseFinder
             Point ThisRC = dgv_phrases.CurrentCellAddress;
             int iRow = ThisRC.Y;
             int iCol = ThisRC.X;
-            ThisPageList = phlist[iRow].strPages.Split(',').Select(int.Parse).ToArray();
-            nudPage.Maximum = ThisPageList.Length - 1;
-            iCurrentPage = -1;
-            tbViewPage.Text = ThisPageList[0].ToString();
-            tbViewPage.Visible = ThisPageList.Length > 0;   // only show page number of there are pages
-            if (tbViewPage.Visible)
-                iCurrentPage = ThisPageList[0];
-            nudPage.Visible = ThisPageList.Length > 1;      // only show numeric up/down if more than 1 page
+            if (phlist[iRow].strPages != "")
+            {
+                ThisPageList = phlist[iRow].strPages.Split(',').Select(int.Parse).ToArray();
+                nudPage.Maximum = ThisPageList.Length - 1;
+                iCurrentPage = -1;
+                tbViewPage.Text = ThisPageList[0].ToString();
+                tbViewPage.Visible = ThisPageList.Length > 0;   // only show page number of there are pages
+                if (tbViewPage.Visible)
+                    iCurrentPage = ThisPageList[0];
+                nudPage.Visible = ThisPageList.Length > 1;      // only show numeric up/down if more than 1 page
+            }
         }
 
 

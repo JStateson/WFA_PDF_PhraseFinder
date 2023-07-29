@@ -323,14 +323,14 @@
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click_1);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -359,7 +359,7 @@
             this.btnRunSearch.Enabled = false;
             this.btnRunSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRunSearch.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.btnRunSearch.Location = new System.Drawing.Point(12, 65);
+            this.btnRunSearch.Location = new System.Drawing.Point(12, 68);
             this.btnRunSearch.Name = "btnRunSearch";
             this.btnRunSearch.Size = new System.Drawing.Size(96, 23);
             this.btnRunSearch.TabIndex = 13;
