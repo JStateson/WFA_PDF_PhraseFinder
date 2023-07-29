@@ -146,8 +146,21 @@ namespace WFA_PDF_PhraseFinder
             int j = sDT.LastIndexOf('.');
             return sDT.Substring(i, j - i);
         }
-        
-        // must have at least 2 letters
+
+        /// <summary>
+        /// must have at least 2 letters
+        /// WorkingPhrases are only single words, not phrases.  they are in the correct case  to do the matching
+        /// this is to optimize the search as I thought, perhaps wrongly that only a single word was needed
+        /// for actual phrases WorkingPhrase only has the first word the phlist needs to be accessed to
+        /// check additional words that make up the phrase. To do this the document must be read to get
+        /// the additional words.
+        /// </summary>
+        /// <param name="word"></param>
+        /// <param name="iPage"></param>
+        /// <param name="jMax"></param>
+        /// <param name="jWord"></param>
+        /// <param name="bError"></param>
+        /// <returns></returns>
         private bool bMatchWord(string word, int iPage, int jMax, ref int jWord, ref bool bError)
         {
             int n;
@@ -190,7 +203,11 @@ namespace WFA_PDF_PhraseFinder
             return false;
         }
 
-        // count number of words in the phrase
+        /// <summary>
+        /// count number of matches for that were found for each phrase 
+        /// and return the total number of matches
+        /// </summary>
+        /// <returns></returns>
         private long GetMatchCount()
         {
             long lCnt = 0;
@@ -203,7 +220,13 @@ namespace WFA_PDF_PhraseFinder
             return lCnt;
         }
 
-        //progress bar
+        /// <summary>
+        /// progress bar
+        /// note that DoEvents had the side effect of allowing the use to click on widgets
+        /// while the program is running.  One must disable some feature to prevent, for example,
+        /// starting a new search before the old search has finished.
+        /// </summary>
+        /// <param name="p"></param>
         private void SetPBAR(int p)
         {
             double pbarSlope =  pbarLoading.Maximum * p;
@@ -228,7 +251,7 @@ namespace WFA_PDF_PhraseFinder
             }
             catch
             {
-                tbPdfName.Text = "missing Adobe DLL or file:" + tbPdfName.Text;
+                tbPdfName.Text = "missing Adobe DLL or bad file:" + tbPdfName.Text;
                 return false;
             }
             return true;
@@ -251,6 +274,10 @@ namespace WFA_PDF_PhraseFinder
             return chkWord;
         }
 
+        /// <summary>
+        /// Open the PDF using Acrobat (I assume) and position to the current page selected
+        /// </summary>
+        /// <param name="fileName"></param>
         private void ViewDoc(string fileName)
         {
             ThisDoc = new AcroAVDoc();
@@ -258,7 +285,7 @@ namespace WFA_PDF_PhraseFinder
             ThisDoc.BringToFront();
             ThisDoc.SetViewMode(2); // PDUseThumbs
             ThisDocView = ThisDoc.GetAVPageView() as CAcroAVPageView;
-            //pageView.ZoomTo(1 /*AVZoomFitPage*/, 100);
+            //ThisDocView.ZoomTo(1 /*AVZoomFitPage*/, 100); // was in an example app, not sure how useful
             ThisDocView.GoTo(iCurrentPage-1);
         }
 
@@ -288,8 +315,6 @@ namespace WFA_PDF_PhraseFinder
 
             for (int p = 0; p < TotalPDFPages; p++)
             {
-                //string strTemp = theseFields.ExecuteThisJavascript("event.value=this.getPageNumWords(" + p + ");");
-                //if (strTemp == null) continue;
                 jWord = -1;
                 SetPBAR(p);
                 if (p > 40 && cbStopEarly.Checked) break;
@@ -300,7 +325,7 @@ namespace WFA_PDF_PhraseFinder
                     if (jWord == numWords) break;
                     chkWord = GetThisWord(jWord, numWords, p, ref bError);
                     if (bError) return false;
-                    //OutText = OutText + " " + chkWord;
+                    if (bError) return false;
                     if(bMatchWord(chkWord,p,numWords, ref jWord, ref bError))
                     {
                         //found a match and have counted it
@@ -308,7 +333,7 @@ namespace WFA_PDF_PhraseFinder
                     }
                 }
             }
-            SetPBAR(0);   // clear the progress bar
+            SetPBAR(0);   // clear the progress bar and show results of the pattern search
             for(int i = 0; i < NumPhrases;i++)
             {
                 if (phlist[i].iNumber > 0)
@@ -324,7 +349,7 @@ namespace WFA_PDF_PhraseFinder
             avDoc.Close(0);
             avDoc = null;
             formApp = null;
-            dgv_phrases.DataSource = phlist.ToArray();
+            dgv_phrases.DataSource = phlist.ToArray(); // connect results to the data grid view widget
             bFormDirty = true;
             gbPageCtrl.Visible = TotalMatches > 0;  // show page control group only if matches found
             return true;
@@ -346,7 +371,7 @@ namespace WFA_PDF_PhraseFinder
             dgv_phrases.DataSource = phlist.ToArray();                    
         }
 
-        //the phrase list is saved into windows AppData 
+        //the phrase list is saved into windows AppData or where windows hides setup stuff
         private void SaveSettings()
         {
             // should be at AppData\Local\Microsoft\YOUR APPLICATION NAME File name is user.config
@@ -399,8 +424,8 @@ namespace WFA_PDF_PhraseFinder
             }
             FillPhrases();
             GetLocalSettings();
-            tbPdfName.Text = "Build date: " + GetSimpleDate(Properties.Resources.BuildDate) + " (v) 1.0 (c)Stateson";
-            //AdobePresent();
+            tbPdfName.Text = "Build date: " + GetSimpleDate(Properties.Resources.BuildDate) +
+                " (v) 1.0 (c)Stateson";
         }
 
 
@@ -433,11 +458,6 @@ namespace WFA_PDF_PhraseFinder
             btnRunSearch.Enabled =  bOpenDocs(tbPdfName.Text);
         }
 
-        //close was not needed as the file is opened and closed after every search
-        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void btnSelectAll_Click(object sender, EventArgs e)
         {
@@ -465,10 +485,15 @@ namespace WFA_PDF_PhraseFinder
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Close();
+            this.Close(); // may want to prompt user to save changes ???
         }
 
-
+        /// <summary>
+        /// starts the search. The workingphrase (actually just word) has its case pre-set to optimize code
+        /// unfortunately that only works good if there are only single words to maltch against and not phrases
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnRunSearch_Click(object sender, EventArgs e)
         {
             // create the search list used for searching
@@ -487,7 +512,8 @@ namespace WFA_PDF_PhraseFinder
         }
 
         // the phrase list was edited so copy the edits so they can be saved
-        // the searching is done using using the InitialPhrase list
+        // the searching is done starting with the InitialPhrase list
+        // and then setting up workingphrase and phlist 
         private void UpdateSettings()
         {
             for (int i = 0; i < NumPhrases; i++)
@@ -610,39 +636,7 @@ namespace WFA_PDF_PhraseFinder
             }
         }
 
-        /// <summary>
-        /// This was supposed to check to to see if the license expired but it was not usefull
-        /// was easier to use the "try" and report an error if cannot open Adobe pro
-        /// It did not work for that matter
-        /// </summary>
-        /// <returns></returns>
-        private bool AdobePresent()
-        {
 
-            RegistryKey adobe = Registry.LocalMachine.OpenSubKey("Software").OpenSubKey("Adobe");
-            if (null == adobe)
-            {
-                var policies = Registry.LocalMachine.OpenSubKey("Software").OpenSubKey("Policies");
-                if (null == policies)
-                    return false ;
-                adobe = policies.OpenSubKey("Adobe");
-            }
-            if (adobe != null)
-            {
-                RegistryKey acroRead = adobe.OpenSubKey("Adobe Acrobat");
-                if (acroRead != null)
-                {
-                    string[] acroReadVersions = acroRead.GetSubKeyNames();
-                    string strTemp = "The following version(s) of Acrobat Reader are installed:\r\n ";
-                    foreach (string versionNumber in acroReadVersions)
-                    {
-                        strTemp += versionNumber + "\r\n";
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
 
         /// <summary>
         /// user changed the status of the stop early switch
