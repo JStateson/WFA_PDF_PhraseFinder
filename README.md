@@ -1,6 +1,6 @@
 # WFA_PDF_PhraseFinder DO NOT USE
 
-This is old, replaced by PDF_PhraseFinder 
+This is old, replaced by PDF-PhraseFinder 
 
 Concept app that looks for words or phrases in a pdf
 
