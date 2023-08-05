@@ -1,4 +1,7 @@
-# WFA_PDF_PhraseFinder
+# WFA_PDF_PhraseFinder DO NOT USE
+
+This is old, replaced by PDF_PhraseFinder 
+
 Concept app that looks for words or phrases in a pdf
 
 reports the page number and count of the occurrences
